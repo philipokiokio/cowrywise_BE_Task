@@ -47,7 +47,8 @@ class BookUpdate(AbstractModel):
 
 class BorrowBookProfile(BorrowBook):
     uid: UUID
-    book : Optional[BookProfile] = None
+    book: Optional[BookProfile] = None
+
 
 class BookFilter(PaginatedQuery):
     publisher: Optional[str] = None

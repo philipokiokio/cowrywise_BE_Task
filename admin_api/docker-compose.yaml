@@ -1,0 +1,43 @@
+services:
+  # FastAPI application
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_api_app
+    ports:
+      - "6970:6970"
+    environment:
+      - POSTGRES_URL=${POSTGRES_URL}
+      - REDIS_URL=${REDIS_URL}
+      - AMPQ_URL=${AMPQ_URL}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    command: make start_server
+  # PostgreSQL Database
+  db:
+    image: postgres:13
+    container_name: backend_postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cowrywise_backend
+    ports:
+      - "6543:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist database data
+
+  redis:
+    image: redis:7.2.5-alpine
+    container_name: backend_redis
+    ports:
+      - "7239:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
