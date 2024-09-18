@@ -10,6 +10,8 @@ from services.service_exception import (
     CreateError,
     NotFoundError,
 )
+from sqlalchemy.exc import IntegrityError
+
 from uuid import UUID
 
 LOGGER = logging.getLogger(__name__)
@@ -18,14 +20,17 @@ LOGGER = logging.getLogger(__name__)
 async def create_user(user: User) -> UserProfile:
     async with async_session() as session:
         stmt = insert(User_DB).values(user.model_dump()).returning(User_DB)
+        try:
+            result = (await session.execute(statement=stmt)).scalar_one_or_none()
 
-        result = (await session.execute(statement=stmt)).scalar_one_or_none()
+            if not result:
+                LOGGER.error("create_user failed")
+                await session.rollback()
+                raise CreateError
 
-        if not result:
-            LOGGER.error("create_user failed")
-            session.rollback()
+        except IntegrityError:
+            await session.rollback()
             raise CreateError
-
         await session.commit()
         return UserProfile(**result.as_dict())
 

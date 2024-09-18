@@ -11,6 +11,7 @@ from services.service_exception import (
 )
 from uuid import UUID
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import IntegrityError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -18,16 +19,19 @@ LOGGER = logging.getLogger(__name__)
 async def create_book(book: schemas.Book):
 
     async with async_session() as session:
+        try:
 
-        stmt = insert(Book_DB).values(**book.model_dump()).returning(Book_DB)
+            stmt = insert(Book_DB).values(**book.model_dump()).returning(Book_DB)
 
-        result = (await session.execute(statement=stmt)).scalar_one_or_none()
+            result = (await session.execute(statement=stmt)).scalar_one_or_none()
 
-        if result is None:
-            LOGGER.error(f"book failed to create: {book.model_dump()}")
+            if result is None:
+                LOGGER.error(f"book failed to create: {book.model_dump()}")
+                await session.rollback()
+                raise CreateError
+        except IntegrityError:
             await session.rollback()
             raise CreateError
-
         await session.commit()
 
         return schemas.BookProfile(**result.as_dict())
