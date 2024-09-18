@@ -1,0 +1,4 @@
+.*/.env
+.*/.local_migration
+.*/venv
+
