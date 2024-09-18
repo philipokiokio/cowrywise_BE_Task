@@ -37,7 +37,7 @@ local-head:
 
 
 start_server:
-	uvicorn root.app:app --reload --port=6969
+	uvicorn root.app:app --reload --port=6969  --host=0.0.0.0
 
 start_cron_job:
 	celery -A root.celery_jobs worker -B --loglevel=INFO  

@@ -7,13 +7,11 @@ services:
     container_name: backend_api_app
     ports:
       - "6970:6970"
-    environment:
-      - POSTGRES_URL=${POSTGRES_URL}
-      - REDIS_URL=${REDIS_URL}
-      - AMPQ_URL=${AMPQ_URL}
     depends_on:
       - db
       - redis
+    env_file:
+      - .env
     volumes:
       - .:/app
     command: make start_server

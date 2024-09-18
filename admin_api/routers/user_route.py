@@ -18,7 +18,7 @@ async def get_user(user_uid: UUID):
 @api_router.get(
     "/", response_model=schemas.PaginatedUserProfile, status_code=status.HTTP_200_OK
 )
-async def get_user_via_mail(
+async def get_users(
     user_filter: schemas.PaginatedQuery = Depends(schemas.PaginatedQuery),
 ):
     return await user_service.get_users()

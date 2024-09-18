@@ -7,10 +7,8 @@ services:
     container_name: frontend_api_app
     ports:
       - "6969:6969"
-    environment:
-      - POSTGRES_URL=${POSTGRES_URL}
-      - REDIS_URL=${REDIS_URL}
-      - AMPQ_URL=${AMPQ_URL}
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
@@ -45,11 +43,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - REDIS_URL=${REDIS_URL}
-      - POSTGRES_URL=${POSTGRES_URL}
-      - AMPQ_URL=${AMPQ_URL}
-
+    env_file:
+      - .env
     volumes:
       - .:/app
     command: make start_cron_job
