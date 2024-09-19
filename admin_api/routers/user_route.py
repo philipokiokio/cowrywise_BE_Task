@@ -21,4 +21,4 @@ async def get_user(user_uid: UUID):
 async def get_users(
     user_filter: schemas.PaginatedQuery = Depends(schemas.PaginatedQuery),
 ):
-    return await user_service.get_users()
+    return await user_service.get_users(**user_filter.model_dump())

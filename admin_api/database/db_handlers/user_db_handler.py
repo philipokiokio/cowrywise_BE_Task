@@ -10,6 +10,7 @@ from schemas.user_schemas import (
     BorrowBookProfile,
 )
 from sqlalchemy import insert, select
+from sqlalchemy.exc import IntegrityError
 from services.service_exception import (
     CreateError,
     NotFoundError,
@@ -23,12 +24,17 @@ LOGGER = logging.getLogger(__name__)
 async def create_user(user: User) -> UserProfile:
     async with async_session() as session:
         stmt = insert(User_DB).values(user.model_dump()).returning(User_DB)
+        try:
+            result = (await session.execute(statement=stmt)).scalar_one_or_none()
 
-        result = (await session.execute(statement=stmt)).scalar_one_or_none()
+            if not result:
+                LOGGER.error("create_user failed")
+                await session.rollback()
+                raise CreateError
 
-        if not result:
+        except IntegrityError:
             LOGGER.error("create_user failed")
-            session.rollback()
+            await session.rollback()
             raise CreateError
 
         await session.commit()

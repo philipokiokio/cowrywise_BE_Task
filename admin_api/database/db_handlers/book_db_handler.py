@@ -3,9 +3,10 @@ from database.orms.book_orm import BookBorrowed as BorrowedBook_DB
 from root.database import async_session
 import logging
 import schemas.book_schemas as schemas
-from sqlalchemy import insert, select, or_, update, and_
+from sqlalchemy import insert, select, or_, update
 from services.service_exception import (
     CreateError,
+    UpdateError,
     NotFoundError,
 )
 from sqlalchemy.orm import joinedload
@@ -23,7 +24,6 @@ async def create_book(book: schemas.Book, admin_uid: UUID):
             .values(**book.model_dump(), admin_uid=admin_uid)
             .returning(Book_DB)
         )
-
         result = (await session.execute(statement=stmt)).scalar_one_or_none()
 
         if result is None:
@@ -132,6 +132,7 @@ async def update_book(book_id: UUID, is_borrowed: bool):
                 f"book failed to update for id: {book_id}, with payload : {is_borrowed}"
             )
             await session.rollback()
+            raise UpdateError
 
         await session.commit()
 

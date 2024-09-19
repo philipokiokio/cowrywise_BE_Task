@@ -1,6 +1,6 @@
 import logging
 import schemas.book_schemas as schemas
-from services.mq_publisher import mq_publish
+import services.mq_publisher as mq
 from services.service_exception import CreateError, NotFoundError, UpdateError
 from uuid import UUID
 import database.db_handlers.book_db_handler as book_db_handler
@@ -38,7 +38,9 @@ async def create_book(book: schemas.Book, admin_uid: UUID):
 
     try:
         try:
+
             await fetch_book(title=book.title)
+
         except HTTPException:
             LOGGER.info("creating book record")
 
@@ -53,9 +55,14 @@ async def create_book(book: schemas.Book, admin_uid: UUID):
                 default=str,
             )
             # Publishing to Queue
-            await mq_publish(data=data, routing_key="create_book")
+            await mq.mq_publish(data=data, routing_key="create_book")
 
             return book_profile
+
+        raise HTTPException(
+            detail="book exists", status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     except CreateError:  # noqa: F821
         LOGGER.error(f"book failed to create for {book.model_dump()}")
         pass
@@ -67,12 +74,16 @@ async def get_books(**kwargs):
 
 async def update_book(book_uid: UUID, book_update: schemas.BookUpdate):
 
-    await get_book(book_uid=book_uid)
+    book = await get_book(book_uid=book_uid)
 
     try:
 
         if book_update.is_borrowed:
-
+            if book.is_borrowed:
+                raise HTTPException(
+                    detail="book is not available to be borrowed",
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
             book_borrow = schemas.BorrowBook(**book_update.model_dump())
             await book_db_handler.create_borrowed_record(book_borrow=book_borrow)
 
