@@ -5,10 +5,7 @@ from root.database import async_session
 import logging
 import schemas.book_schemas as schemas
 from sqlalchemy import insert, select, or_, update, and_
-from services.service_exception import (
-    CreateError,
-    NotFoundError,
-)
+from services.service_exception import CreateError, NotFoundError, UpdateError
 from uuid import UUID
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
@@ -116,6 +113,7 @@ async def update_book(book_id: UUID, is_borrowed: bool):
                 f"book failed to update for id: {book_id}, with payload : {is_borrowed}"
             )
             await session.rollback()
+            raise UpdateError
 
         await session.commit()
 

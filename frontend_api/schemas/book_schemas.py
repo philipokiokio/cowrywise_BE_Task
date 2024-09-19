@@ -43,12 +43,5 @@ class BookFilter(PaginatedQuery):
     category: Optional[str] = None
 
 
-class BorrowBook(AbstractModel):
-    book_uid: UUID
-    date_borrowed: date
-    duration_borrowed_for: int
-    borrowed_by: UUID
-
-
 class BorrowBookProfile(BorrowBook):
     uid: UUID

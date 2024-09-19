@@ -1,7 +1,8 @@
 from faker import Faker
 from schemas import user_schemas, book_schemas
-from uuid import uuid4
-from datetime import date, datetime, timedelta
+from uuid import uuid4, UUID
+from datetime import date, datetime
+from random import randint
 
 faker = Faker()
 
@@ -17,6 +18,13 @@ def get_user():
     )
 
 
+def get_user_profile(user: user_schemas.User, user_uid: UUID):
+
+    return user_schemas.UserProfile(
+        user_uid=user_uid, date_created_utc=datetime.utcnow(), **user.model_dump()
+    )
+
+
 def get_book():
     return book_schemas.Book(
         book_uid=uuid4(),
@@ -26,3 +34,30 @@ def get_book():
         category=faker.name(),
         admin_uid=uuid4(),
     )
+
+
+def get_book_profile(book: book_schemas.Book, is_borrowed: bool = False):
+
+    return book_schemas.BookProfile(is_borrowed=is_borrowed, **book.model_dump())
+
+
+def get_borrow_book(book_uid: UUID, borrowed_by: UUID):
+    return book_schemas.BorrowBook(
+        date_borrowed=date.today(),
+        duration_borrowed_for=randint(0, 4),
+        book_uid=book_uid,
+        borrowed_by=borrowed_by,
+    )
+
+
+def get_book_update(is_borrowed: bool, borrowed_by: UUID):
+    return book_schemas.BookUpdate(
+        date_borrowed=date.today(),
+        duration_borrowed_for=randint(0, 4),
+        is_borrowed=is_borrowed,
+        borrowed_by=borrowed_by,
+    )
+
+
+def get_borrow_book_profile(borrow_book: book_schemas.BorrowBook, uid: UUID):
+    return book_schemas.BorrowBookProfile(uid=uid, **borrow_book.model_dump())

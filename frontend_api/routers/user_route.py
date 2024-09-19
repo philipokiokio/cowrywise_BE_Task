@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Body, status
+from fastapi import APIRouter, Body, HTTPException, status
 from pydantic import EmailStr
 
+from services.service_exception import NotFoundError
 import services.user_service as user_service
 import schemas.user_schemas as schemas
 
@@ -29,4 +30,9 @@ async def get_user(user_uid: UUID):
     "/", response_model=schemas.UserProfile, status_code=status.HTTP_200_OK
 )
 async def get_user_via_mail(email: EmailStr = Body(embed=True)):
-    return await user_service.get_user_by_mail(email=email)
+    try:
+        return await user_service.get_user_by_mail(email=email)
+    except NotFoundError:
+        raise HTTPException(
+            detail="user not found", status_code=status.HTTP_404_NOT_FOUND
+        )

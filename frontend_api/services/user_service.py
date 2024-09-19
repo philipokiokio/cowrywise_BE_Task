@@ -2,7 +2,7 @@ import logging
 from schemas.user_schemas import User
 import database.db_handlers.user_db_handler as user_db_handler
 from fastapi import HTTPException, status
-from services.mq_publisher import mq_publish
+import services.mq_publisher as mq
 from services.service_exception import NotFoundError
 from uuid import UUID
 import json
@@ -25,7 +25,7 @@ async def user_sign_up(user: User):
         await get_user_by_mail(email=user.email)
 
         raise HTTPException(
-            detail="user is exists", status_code=status.HTTP_400_BAD_REQUEST
+            detail="user exists", status_code=status.HTTP_400_BAD_REQUEST
         )
     # else create record
     except NotFoundError:
@@ -34,7 +34,7 @@ async def user_sign_up(user: User):
         # MQ publish
 
         data = json.dumps(user_profile.model_dump(), default=str)
-        await mq_publish(data=data, routing_key="create_library_user")  # noqa: F821
+        await mq.mq_publish(data=data, routing_key="create_library_user")  # noqa: F821
         return user_profile
 
 

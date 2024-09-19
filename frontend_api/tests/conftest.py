@@ -5,8 +5,8 @@ import pytest
 from unittest.mock import patch
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from ..root.utils.abstract_base import AbstractBase
-from ..tests.conftest_utils.db_test_setup import SqlDbTestConnector
+from root.utils.abstract_base import AbstractBase
+from tests.conftest_utils.db_test_setup import SqlDbTestConnector
 import asyncio
 import logging
 
@@ -41,6 +41,7 @@ async def setup_test_db(db_connector):
     engine = create_engine(db_connector.get_sync_db_url(), echo=True)
     LOGGER.info("Creating tables...")
     AbstractBase.metadata.create_all(engine)
+
     LOGGER.info(db_connector.get_sync_db_url())
 
     engine = create_async_engine(url=db_connector.get_db_url(), echo=True)
@@ -58,7 +59,8 @@ async def session(setup_test_db):
             "database.db_handlers.user_db_handler.async_session"
         ) as mock_session:
             mock_session.return_value = session
-        with patch(
-            "database.db_handlers.book_db_handler.async_session"
-        ) as mock_session:
-            mock_session.return_value = session
+            with patch(
+                "database.db_handlers.book_db_handler.async_session"
+            ) as mock_session:
+                mock_session.return_value = session
+                yield

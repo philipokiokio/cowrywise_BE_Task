@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 
 from uuid import UUID
 
+
 LOGGER = logging.getLogger(__name__)
 
 

@@ -1,6 +1,6 @@
 import logging
 import schemas.book_schemas as schemas
-from services.mq_publisher import mq_publish
+import services.mq_publisher as mq
 from services.service_exception import CreateError, NotFoundError, UpdateError
 from uuid import UUID
 import database.db_handlers.book_db_handler as book_db_handler
@@ -66,7 +66,7 @@ async def update_book(book_uid: UUID, book_update: schemas.BookUpdate):
         data["book_uid"] = str(book_uid)
 
         data = json.dumps(data, default=str)
-        await mq_publish(data=data, routing_key="update_book")
+        await mq.mq_publish(data=data, routing_key="update_book")
 
         return updated_book
 
