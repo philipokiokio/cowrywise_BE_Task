@@ -37,9 +37,10 @@ local-head:
 
 start_server:
 	uvicorn root.app:app --reload --port=6970 --host=0.0.0.0
-
+	
 prod_server:
-	uvicorn root.app:app --port=10000 --host=0.0.0.0
+	alembic upgrade heads && uvicorn root.app:app --port=10000 --host=0.0.0.0
+
 all-test:
 	pytest tests
 
