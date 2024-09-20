@@ -14,3 +14,7 @@ Tests can be run using `make all-test`.
 
 There are unit tests, while the integration tests are being updated. 
 
+
+
+I could not deploy the dockerized app because render does not support docker-compose.
+
