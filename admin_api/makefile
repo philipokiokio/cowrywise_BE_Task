@@ -39,7 +39,8 @@ local-head:
 start_server:
 	uvicorn root.app:app --reload --port=6970 --host=0.0.0.0
 
-
+all-test:
+	pytest tests
 
 format : 
 	$(BLACK) --preview ./project_name

@@ -34,7 +34,8 @@ local-migrate-down:
 local-head:
 	alembic -c local_dev_alembic.ini heads
 
-
+all-test:
+	pytest --cov=groundible tests
 
 start_server:
 	uvicorn root.app:app --reload --port=6969  --host=0.0.0.0
