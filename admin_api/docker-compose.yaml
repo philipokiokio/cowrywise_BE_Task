@@ -14,7 +14,7 @@ services:
       - .env
     volumes:
       - .:/app
-    command: make start_server
+    command: make prod_server
   # PostgreSQL Database
   db:
     image: postgres:13
