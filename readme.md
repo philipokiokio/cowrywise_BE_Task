@@ -15,6 +15,5 @@ Tests can be run using `make all-test`.
 There are unit tests, while the integration tests are being updated. 
 
 
-
-I could not deploy the dockerized app because render does not support docker-compose.
-
+Frontend API: https://cowrywise-be-task.onrender.com/docs
+Admin API: https://cowrywise-admin-api.onrender.com/docs
