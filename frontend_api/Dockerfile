@@ -23,4 +23,4 @@ RUN apt-get update && apt-get install -y make && rm -rf /var/lib/apt/lists/*
 
 
 # Run FastAPI app with Uvicorn
-CMD ["make", "run_server"]
+CMD ["make", "prod_server"]
